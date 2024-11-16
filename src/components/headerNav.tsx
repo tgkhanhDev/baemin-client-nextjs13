@@ -1,6 +1,6 @@
 "use client";
 import { Button, Select, Dropdown, Space } from "antd";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useAppDispatch } from "@/src/store";
 import { getShopThunk } from "@/src/store/shopManager/thunk";
 import Search from "antd/es/input/Search";
@@ -10,8 +10,10 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   SwapOutlined,
+  PoweroffOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
+import { useSelector } from "react-redux";
 
 const items: MenuProps["items"] = [
   {
@@ -32,12 +34,20 @@ const items: MenuProps["items"] = [
     ),
     icon: <SwapOutlined style={{ fontSize: "16px" }} />,
   },
+  {
+    key: "3",
+    label: (
+      <a href="/login" onClick={() => localStorage.removeItem("user")} style={{ fontSize: "16px" }}>
+        Log out
+      </a>
+    ),
+    icon: <PoweroffOutlined style={{ fontSize: "16px" }} />,
+  }
 ];
 
 export default function HeaderNav() {
   const dispatch = useAppDispatch();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
-
   const { Option } = Select;
   const handleSelectChange = (value: string) => {
     const city = value === "" ? null : value;
@@ -45,11 +55,21 @@ export default function HeaderNav() {
     fetchData(city);
   };
 
+  const [userSlice, setUserSlice] = useState<any>(null);
+  const user = useSelector((state: any) => state.manageAuthen.user);
+
+  useEffect(() => {
+    //get user from localstorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    
+    user && setUserSlice(user);
+  }, []);
+
   const fetchData = (city: string | null) => {
     const params = { location: city || undefined };
     dispatch(getShopThunk(params));
   };
-  
+
   const onSearch = (value: string) => {
     const params = { name: value, location: selectedCity || undefined };
     console.log(value)
@@ -105,23 +125,29 @@ export default function HeaderNav() {
           Trang Chủ
         </Button>
         <div className="hover:cursor-pointer">
-          <Dropdown
-            menu={{ items: items }}
-            overlayStyle={{
-              minWidth: "200px",
-              padding: "12px 24px",
-            }}
-          >
-            <a
-              onClick={(e) => e.preventDefault()}
-              className="font-normal leading-5 btn-home"
+          {!userSlice ? (
+            <Button onClick={() => window.location.href = "/login"}>
+              Login
+            </Button>
+          ) : (
+            <Dropdown
+              menu={{ items: items }}
+              overlayStyle={{
+                minWidth: "200px",
+                padding: "12px 24px",
+              }}
             >
-              <Space style={{ fontSize: "18px", color: "rgb(128, 128, 137)" }}>
-                <SolutionOutlined />
-                Tài Khoản
-              </Space>
-            </a>
-          </Dropdown>
+              <a
+                onClick={(e) => e.preventDefault()}
+                className="font-normal leading-5 btn-home"
+              >
+                <Space style={{ fontSize: "18px", color: "rgb(128, 128, 137)" }}>
+                  <SolutionOutlined />
+                  Tài Khoản
+                </Space>
+              </a>
+            </Dropdown>
+          )}
         </div>
         <Button
           href="/cart"

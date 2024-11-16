@@ -22,5 +22,5 @@ export const manageShop = {
     return api.get<utilsResponse<Shop>>(`/?${queryParams.toString()}`);
   },
   getShopDetail: (payload: string) =>
-    api.get<utilsResponse<ShopDetail>>(`/${payload}`),
+    api.get<ShopDetail>(`/${payload}`),
 };
