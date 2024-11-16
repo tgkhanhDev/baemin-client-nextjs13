@@ -4,6 +4,8 @@ import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import HeaderNav from "@/src/components/headerNav";
 import ReduxProvider from "@/src/app/provider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="w-full h-fit">
         <ReduxProvider>
+          <ToastContainer />
           <HeaderNav />
           <AntdRegistry>{children}</AntdRegistry>
         </ReduxProvider>

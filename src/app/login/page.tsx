@@ -7,13 +7,22 @@ import {
 } from "@ant-design/icons";
 import { Input, message } from "antd";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LoginRequest } from "@/src/types/auth";
+import { useAppDispatch } from "@/src/store";
+import { loginThunk } from "@/src/store/authenManager/thunk";
+import { useSelector } from "react-redux";
 
 const Page: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = React.useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const router = useRouter();
+  const [loginReq, setLoginReq] = useState<LoginRequest>({
+    email: "",
+    password: "",
+  });
+  const dispatch = useAppDispatch();
 
   const warning = () => {
     messageApi.open({
@@ -22,8 +31,14 @@ const Page: React.FC = () => {
     });
   };
 
-  const handleLogin = () => {
-    router.push("/profile");
+  const handleLogin = async () => {
+    try {
+      const user = await dispatch(loginThunk(loginReq)).unwrap();
+      // user && router.push("/profile");
+      user && router.push("/dashboard");
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   };
 
   return (
@@ -36,6 +51,12 @@ const Page: React.FC = () => {
         <div className="flex flex-col w-full gap-3">
           <Input
             placeholder="Email/Số điện thoại"
+            onChange={(e) => {
+              setLoginReq({
+                ...loginReq,
+                email: e.target.value,
+              })
+            }}
             className="h-[40px]"
           />
         </div>
@@ -46,6 +67,12 @@ const Page: React.FC = () => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
+            onChange={(e) => {
+              setLoginReq({
+                ...loginReq,
+                password: e.target.value,
+              })
+            }}
           />
         </div>
         <div className="flex flex-col w-full mt-3">

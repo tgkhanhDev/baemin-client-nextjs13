@@ -1,13 +1,46 @@
 "use client";
+import { useAppDispatch } from "@/src/store";
+import { registerThunk } from "@/src/store/authenManager/thunk";
+import { RegisterRequest } from "@/src/types/auth";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { Input } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 const Page: React.FC = () => {
   const router = useRouter();
-  const handleNavigate = () => {
-    router.push("/login");
+  const [register, setRegister] = useState<RegisterRequest>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    password: "",
+    confirm_password: "",
+  })
+  const dispatch = useAppDispatch();
+  const handleNavigate =  async () => {
+    if (register.password !== register.confirm_password) {
+      toast.error("Password does not match");
+    }
+    const req = {
+      first_name: register.first_name,
+      last_name: register.last_name,
+      phone_number: register.phone_number,
+      email: register.email,
+      password: register.password,
+    }
+
+    try {
+      const res = await dispatch(registerThunk(req)).unwrap();
+      res && router.push("/login");
+      toast.success("Register successfully");
+    } catch (error:any) {
+      toast.error(`Some thing wrong, please try again: ${error.response.data.message[0]}`);
+      console.error("Error: ", error.response.data.message);
+    }
+
   };
   return (
     <>
@@ -16,14 +49,14 @@ const Page: React.FC = () => {
           Đăng Kí
         </div>
         <div className="flex flex-row w-full gap-2">
-          <Input placeholder="Họ " className="h-[40px]" />
-          <Input placeholder="Tên" className="h-[40px]" />
+          <Input placeholder="Họ " className="h-[40px]" onChange={(e) => setRegister({ ...register, first_name: e.target.value })} />
+          <Input placeholder="Tên" className="h-[40px]" onChange={(e) => setRegister({ ...register, last_name: e.target.value })} />
         </div>
         <div className="flex flex-col w-full gap-3">
-          <Input placeholder="Số điện thoại" className="h-[40px]" />
+          <Input placeholder="Số điện thoại" className="h-[40px]" onChange={(e) => setRegister({ ...register, phone_number: e.target.value })} />
         </div>
         <div className="flex flex-col w-full gap-3">
-          <Input placeholder="Email" className="h-[40px]" />
+          <Input placeholder="Email" className="h-[40px]" onChange={(e) => setRegister({ ...register, email: e.target.value })} />
         </div>
         <div className="flex flex-col w-full ">
           <Input.Password
@@ -32,6 +65,7 @@ const Page: React.FC = () => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
+            onChange={(e) => setRegister({ ...register, password: e.target.value })}
           />
         </div>
         <div className="flex flex-col w-full ">
@@ -41,7 +75,8 @@ const Page: React.FC = () => {
             iconRender={(visible) =>
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
-          /> 
+            onChange={(e) => setRegister({ ...register, confirm_password: e.target.value })}
+          />
         </div>
         <div className="flex flex-col w-full">
           <button className="w-full h-[40px] uppercase text-white bg-beamin rounded-lg" onClick={handleNavigate}>

@@ -20,7 +20,7 @@ export const manageShopSlice = createSlice({
     builder.addCase(getShopThunk.fulfilled, (state, { payload }) => {
       state.shop = payload;
     });
-    builder.addCase(getShopDetailThunk.fulfilled, (state, { payload }) => {
+    builder.addCase(getShopDetailThunk.fulfilled, (state, { payload }) => {      
       state.shopDetail = payload;
     });
   },
