@@ -1,15 +1,8 @@
 import { apiInstance } from "../constant/apiInstance";
-import { Shop, ShopDetail } from "../types/shop";
+import { Shop, ShopDetail, FilterParams } from "../types/shop";
 import { utilsResponse } from "../types/utils";
 
 const api = apiInstance("http://localhost:8080/shop-api");
-
-interface FilterParams {
-  name?: string;
-  location?: string;
-  label?: string;
-  type?: string;
-}
 
 export const manageShop = {
   getShop: (params: FilterParams = {}) => {

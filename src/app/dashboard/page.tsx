@@ -20,7 +20,7 @@ export default function Home() {
     }, [dispatch, selectedType]);
 
     const items = [
-        { name: "Tất cả", type: null, imageSrc: "", description: "Tất cả" },
+        { name: "Tất cả", type: null, imageSrc: "/images/all.png", description: "Tất cả" },
         { name: "Thức ăn", type: "Food", imageSrc: "/images/burger.png", description: "Thức ăn" },
         { name: "Nước uống", type: "Drink", imageSrc: "/images/drink.png", description: "Nước uống" },
         { name: "Đồ ăn chay", type: "Vege", imageSrc: "/images/vege.png", description: "Đồ ăn chay" },

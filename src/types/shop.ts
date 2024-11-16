@@ -1,5 +1,12 @@
 import { Food } from "./food";
 
+export interface FilterParams {
+  name?: string;
+  location?: string;
+  label?: string;
+  type?: string;
+}
+
 export interface Shop {
   shop_id: string;
   shop_name: string;
