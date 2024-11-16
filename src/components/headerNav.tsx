@@ -1,8 +1,9 @@
 "use client";
 import { Button, Select, Dropdown, Space } from "antd";
-import { SearchProps } from "antd/es/input";
-import Search from "antd/es/input/Search";
 import { useState } from "react";
+import { useAppDispatch } from "@/src/store";
+import { getShopThunk } from "@/src/store/shopManager/thunk";
+import Search from "antd/es/input/Search";
 import {
   HomeOutlined,
   SolutionOutlined,
@@ -10,7 +11,6 @@ import {
   UserOutlined,
   SwapOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import type { MenuProps } from "antd";
 
 const items: MenuProps["items"] = [
@@ -35,19 +35,30 @@ const items: MenuProps["items"] = [
 ];
 
 export default function HeaderNav() {
-  const router = useRouter();
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    router.push("/search");
+  const dispatch = useAppDispatch();
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  const { Option } = Select;
+  const handleSelectChange = (value: string) => {
+    const city = value === "" ? null : value;
+    setSelectedCity(city);
+    fetchData(city);
   };
-  const navigation = () => {
-    router.push("/dashboard");
+
+  const fetchData = (city: string | null) => {
+    const params = { location: city || undefined };
+    dispatch(getShopThunk(params));
   };
+  
+  const onSearch = (value: string) => {
+    const params = { name: value, location: selectedCity || undefined };
+    console.log(value)
+    dispatch(getShopThunk(params));
+  };
+
   return (
     <div className="w-full h-fix bg-white flex flex-row fixed  py-3 gap-4 justify-items-center	justify-center z-50	">
-      <div
-        onClick={navigation}
-        className="flex-none w-fit h-full ml-10 cursor-pointer "
-      >
+      <div className="flex-none w-fit h-full ml-10 cursor-pointer ">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="131"
@@ -60,7 +71,17 @@ export default function HeaderNav() {
         </svg>
       </div>
       <div className="grow  flex flex-row items-center gap-9	 ">
-        <Select className="ml-10 w-28 	"></Select>
+        <Select
+          className="ml-10 w-44"
+          value={selectedCity ?? ""}
+          onChange={handleSelectChange}
+          placeholder="Chọn thành phố"
+        >
+          <Option value="">Tất cả</Option>
+          <Option value="Ho_Chi_Minh">Hồ Chí Minh</Option>
+          <Option value="Ha_Noi">Hà Nội</Option>
+          <Option value="Da_Nang">Đà Nẵng</Option>
+        </Select>
         <Search
           className="w-1/3"
           placeholder="Tìm kiếm Shop"

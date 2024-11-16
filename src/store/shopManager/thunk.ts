@@ -3,9 +3,10 @@ import { manageShop } from "../../services/manageShop";
 
 export const getShopThunk = createAsyncThunk(
   "shop",
-  async (_, { rejectWithValue }) => {
+  async (params: { name?: string; location?: string; label?: string; type?: string } = {}, 
+  { rejectWithValue }) => {
     try {
-      const data = await manageShop.getShop();
+      const data = await manageShop.getShop(params);
       return data.data;
     } catch (error) {
       console.log("API error:", error);

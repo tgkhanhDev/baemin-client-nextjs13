@@ -4,9 +4,9 @@ import { Food } from "../../types/food";
 
 export const getFoodThunk = createAsyncThunk(
   "food",
-  async (payload: Food, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const data = await manageFood.getFood(payload);
+      const data = await manageFood.getFood();
       return data.data;
     } catch (error) {
       console.log("API error:", error);

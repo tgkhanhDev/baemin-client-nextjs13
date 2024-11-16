@@ -48,21 +48,21 @@ export default function ScrollFood({ items }: ScrollFoodProps) {
               {shop.category}
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              {shop.is_open ? "Open Now" : "Closed"} •{" "}
+              {shop.is_open ? "Mở cửa" : "Đóng cửa"} •{" "}
               {new Date(shop.open_time).toLocaleTimeString("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
-                hour12: false, // Sử dụng định dạng 24 giờ
-                timeZone: "UTC", // Giữ nguyên múi giờ UTC
+                hour12: false,
+                timeZone: "UTC",
               })}{" "}
               -{" "}
               {new Date(shop.close_time).toLocaleTimeString("en-GB", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
-                hour12: false, // Sử dụng định dạng 24 giờ
-                timeZone: "UTC", // Giữ nguyên múi giờ UTC
+                hour12: false,
+                timeZone: "UTC",
               })}
             </div>
             <div className="text-sm text-gray-600 mt-1">

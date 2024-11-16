@@ -12,7 +12,6 @@ import {
   PlusOutlined,
   SearchOutlined,
   StarFilled,
-  StarOutlined,
 } from "@ant-design/icons";
 import { Input } from "antd";
 import Image from "next/image";
@@ -21,17 +20,13 @@ import { getShopDetailThunk } from "@/src/store/shopManager/thunk";
 import { useAppDispatch } from "@/src/store";
 import { useShop } from "@/src/hooks/useShop";
 import { useParams } from "next/navigation";
-import { ShopDetail } from "@/src/types/shop";
 
 export default function Home() {
   const params = useParams();
   const id = typeof params?.id === "string" ? params.id : params?.id[0];
 
-  console.log("Shop ID:", id);
-
   const dispatch = useAppDispatch();
   const { shopDetail } = useShop();
-  console.log(shopDetail);
 
   useEffect(() => {
     if (id) {
@@ -39,15 +34,24 @@ export default function Home() {
     }
   }, [dispatch, id]);
 
-  const [isActive, setIsActive] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleMouseDown = () => {
-    setIsActive(true);
+  const handleTypeClick = (type: any) => {
+    setSelectedType(type);
   };
 
-  const handleMouseUp = () => {
-    setIsActive(false);
+  const handleSearch = (e: any) => {
+    setSearchTerm(e.target.value);
   };
+
+  const filteredFood = shopDetail?.Food?.filter((food) => {
+    const matchesType = selectedType ? food.type === selectedType : true;
+    const matchesSearch = food.food_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   return (
     <>
@@ -58,8 +62,8 @@ export default function Home() {
               <Image
                 fill
                 style={{ objectFit: "cover" }}
-                src={"/food/ga1.jpg"}
-                alt="Ga"
+                src={shopDetail?.shop_thumbnail || "/food/ga1.jpg"}
+                alt={shopDetail?.shop_name || "..."}
               ></Image>
             </div>
           </div>
@@ -98,13 +102,49 @@ export default function Home() {
                 <span>đánh giá trên Baemin</span>
               </div>
               <div className="flex flex-row gap-4 justify-start items-center my-1 text-[15px]">
-                <div className="flex flex-row gap-1 text-[#6CC942] justify-start items-center">
-                  <div className="w-2 h-2 bg-[#6CC942] rounded-full"></div>
-                  <span>Mở cửa</span>
+                <div className="flex flex-row gap-1 items-center">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      shopDetail?.is_open ? "bg-[#6CC942]" : "bg-[#FF0000]"
+                    }`}
+                  ></div>
+                  <span
+                    className={`text-sm font-medium ${
+                      shopDetail?.is_open ? "text-[#6CC942]" : "text-[#FF0000]"
+                    }`}
+                  >
+                    {shopDetail?.is_open ? "Mở cửa" : "Đóng cửa"}
+                  </span>
                 </div>
                 <div className="flex flex-row gap-1 justify-start items-center">
                   <ClockCircleTwoTone twoToneColor={"#3AC5C9"} />
-                  <span>06:00 - 22:59</span>
+                  <span>
+                    {shopDetail?.open_time
+                      ? new Date(shopDetail.open_time).toLocaleTimeString(
+                          "en-GB",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                            timeZone: "UTC",
+                          }
+                        )
+                      : "Không xác định"}{" "}
+                    -{" "}
+                    {shopDetail?.close_time
+                      ? new Date(shopDetail.close_time).toLocaleTimeString(
+                          "en-GB",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                            timeZone: "UTC",
+                          }
+                        )
+                      : "Không xác định"}
+                  </span>
                 </div>
               </div>
               <div className="flex flex-row gap-1 justify-start items-center text-[#959595] text-[15px]">
@@ -112,7 +152,9 @@ export default function Home() {
                   twoToneColor={"#c0c0c0"}
                   className="text-[16px]"
                 />
-                <span> 99.000 - 399.000</span>
+                <span>
+                  ${shopDetail?.price_start} - ${shopDetail?.price_end}
+                </span>
               </div>
             </div>
 
@@ -142,81 +184,77 @@ export default function Home() {
             THỰC ĐƠN
           </div>
           <div className="w-full flex flex-row gap-3">
+            {/* Filter Sidebar */}
             <div className="w-[20%] bg-white p-5">
               <ul>
+                {["Combo", "Sale", "Rice Chicken", "Bubble Tea", "None"].map(
+                  (type) => (
+                    <li
+                      key={type}
+                      className={`cursor-pointer w-fit px-1 my-4 ${
+                        selectedType === type.toLowerCase()
+                          ? "bg-blue-500 text-white"
+                          : ""
+                      }`}
+                      onClick={() => handleTypeClick(type.toLowerCase())}
+                    >
+                      {type}
+                    </li>
+                  )
+                )}
                 <li
-                  className={`cursor-pointer w-fit px-1 ${
-                    isActive ? "" : "bg-[#959595] text-white"
+                  className={`cursor-pointer w-fit px-1 my-4 ${
+                    selectedType === null ? "bg-blue-500 text-white" : ""
                   }`}
-                  onMouseDown={handleMouseDown}
-                  onMouseUp={handleMouseUp}
+                  onClick={() => setSelectedType(null)}
                 >
-                  SẢN PHẨM MỚI
+                  Tất cả
                 </li>
-                <li className="mt-2 px-1 w-fit">FAMILY COMBO</li>
-                <li className="mt-2 px-1 w-fit ">GÀ RÁN</li>
-                <li className="mt-2 px-1  w-fit">BURGER</li>
               </ul>
             </div>
-            <div className="w-[50%] h-auto bg-white py-3 flex flex-col px-4">
+
+            {/* Food List */}
+            <div className="w-[100%] h-auto bg-white py-3 flex flex-col px-4">
+              {/* Search Input */}
               <div className="w-full mb-5">
-                <Input addonBefore={<SearchOutlined />} placeholder="" />
+                <Input
+                  addonBefore={<SearchOutlined />}
+                  placeholder="Tìm món ăn..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
               </div>
+              {/* Food Items */}
               <div className="flex flex-col w-full pl-1 gap-3">
-                <div className="font-medium">MÓN ĐANG GIẢM</div>
-                <div className="flex flex-col w-full gap-43 border-b">
-                  <div className="flex flex-row ">
-                    <div className="w-[15%] relative h-16">
-                      {/* <Image fill style={{objectFit:"cover"}} src={'/images/Ga.png'} alt="s" ></Image> */}
-                    </div>
-                    <div className="w-[60%] flex flex-col gap-1 px-2">
-                      <span className="font-bold text-[#464646] ">
-                        Mua 2 Tặng 2 Gà Rán{" "}
-                      </span>
-                      <span className="text-wrap text-sm text-[#464646] ">
-                        Bao gồm: 4 Miếng Gà (Cay/Không Cay), 2 Nước Vừa. Đã bao
-                        gồm 2x Tương Cà, 1x Tương Ớt Ngọt, 1x Tương Ớt Tỏi
-                      </span>
-                    </div>
-                    <div className="w-[15%] flex justify-center items-center">
-                      <span className="text-[#0288d1] font-bold text-base">
-                        118.000đ
-                      </span>
-                    </div>
-                    <div className="w-[10%] flex justify-center items-center">
-                      <div className="h-6 w-6 rounded-md flex justify-center items-center bg-beamin text-white font-bold cursor-pointer hover:brightness-110 ">
-                        <PlusOutlined />
+                {filteredFood?.map((food) => (
+                  <div
+                    key={food.food_id}
+                    className="flex flex-col w-full gap-4 border-b pb-3"
+                  >
+                    <div className="flex flex-row">
+                      <div className="w-[60%] flex flex-col gap-1 px-2">
+                        <span className="font-bold text-[#464646]">
+                          {food.food_name}
+                        </span>
+                        <span className="text-wrap text-sm text-[#464646]">
+                          {food.description}
+                        </span>
+                      </div>
+                      <div className="w-[15%] flex justify-center items-center">
+                        <span className="text-[#0288d1] font-bold text-base">
+                          ${food.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="w-[10%] flex justify-center items-center">
+                        <div className="h-6 w-6 rounded-md flex justify-center items-center bg-beamin text-white font-bold cursor-pointer hover:brightness-110">
+                          <PlusOutlined />
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-row ">
-                    <div className="w-[15%] relative h-16">
-                      {/* <Image fill style={{objectFit:"cover"}} src={'/images/Ga.png'} alt="s" ></Image> */}
-                    </div>
-                    <div className="w-[60%] flex flex-col gap-1 px-2">
-                      <span className="font-bold text-[#464646] ">
-                        Mua 2 Tặng 2 Gà Rán{" "}
-                      </span>
-                      <span className="text-wrap text-sm text-[#464646] ">
-                        Bao gồm: 4 Miếng Gà (Cay/Không Cay), 2 Nước Vừa. Đã bao
-                        gồm 2x Tương Cà, 1x Tương Ớt Ngọt, 1x Tương Ớt Tỏi
-                      </span>
-                    </div>
-                    <div className="w-[15%] flex justify-center items-center">
-                      <span className="text-[#0288d1] font-bold text-base">
-                        118.000đ
-                      </span>
-                    </div>
-                    <div className="w-[10%] flex justify-center items-center">
-                      <div className="h-6 w-6 rounded-md flex justify-center items-center bg-beamin text-white font-bold cursor-pointer hover:brightness-110 ">
-                        <PlusOutlined />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-            <div className="w-[30%] bg-white"></div>
           </div>
         </div>
       </div>

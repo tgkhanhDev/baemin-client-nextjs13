@@ -49,7 +49,7 @@ export default function Home() {
 
                 </div>
             </div>
-            <div className="px-16 flex flex-col gap-3 ">'
+            <div className="px-16 flex flex-col gap-3 ">
                 <div className="w-full h-28 flex flex-col bg-white rounded-md pl-10 pt-5">
                     <div className="flex flex-row gap-1">
                         <div className="text-xl">
