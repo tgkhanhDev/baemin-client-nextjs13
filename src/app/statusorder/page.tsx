@@ -142,9 +142,9 @@ const Page: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='w-full mt-2 border-t'>
+                        {/* <div className='w-full mt-2 border-t'>
                             <DetailsCheckout items={detail}  />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

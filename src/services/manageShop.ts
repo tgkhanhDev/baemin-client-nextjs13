@@ -1,15 +1,8 @@
 import { apiInstance } from "../constant/apiInstance";
-import { Shop, ShopDetail } from "../types/shop";
+import { Shop, ShopDetail, FilterParams } from "../types/shop";
 import { utilsResponse } from "../types/utils";
 
 const api = apiInstance("http://localhost:8080/shop-api");
-
-interface FilterParams {
-  name?: string;
-  location?: string;
-  label?: string;
-  type?: string;
-}
 
 export const manageShop = {
   getShop: (params: FilterParams = {}) => {
@@ -22,5 +15,5 @@ export const manageShop = {
     return api.get<utilsResponse<Shop>>(`/?${queryParams.toString()}`);
   },
   getShopDetail: (payload: string) =>
-    api.get<utilsResponse<ShopDetail>>(`/${payload}`),
+    api.get<ShopDetail>(`/${payload}`),
 };

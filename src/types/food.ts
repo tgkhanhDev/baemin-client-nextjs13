@@ -4,5 +4,6 @@ export interface Food {
     description: string
     price: number
     type: string
+    food_thumbnail: string
     shop_id?: string
   }

@@ -13,17 +13,20 @@ import {
   SearchOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Input } from "antd";
+import { Input, InputNumber, Space } from "antd";
+import type { InputNumberProps } from "antd";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { getShopDetailThunk } from "@/src/store/shopManager/thunk";
 import { useAppDispatch } from "@/src/store";
 import { useShop } from "@/src/hooks/useShop";
 import { useParams } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 export default function Home() {
+  const router = useRouter();
   const params = useParams();
   const id = typeof params?.id === "string" ? params.id : params?.id[0];
+  const [quantity, setQuantity] = useState(1);
 
   const dispatch = useAppDispatch();
   const { shopDetail } = useShop();
@@ -52,6 +55,29 @@ export default function Home() {
       .includes(searchTerm.toLowerCase());
     return matchesType && matchesSearch;
   });
+
+  const onChange: InputNumberProps['onChange'] = (value) => {
+    setQuantity(value as number); // Đảm bảo giá trị là số
+  };
+
+  const buyNow = (food: any, quantity: number) => {
+    if (quantity <= 0) {
+      alert('Vui lòng chọn số lượng hợp lệ!');
+      return;
+    }
+
+    const orderData = {
+      shop_id: id,
+      food: {
+        ...food,
+        quantity,
+      },
+    };
+
+    // Lưu vào localStorage
+    localStorage.setItem('orderData', JSON.stringify(orderData));
+    router.push('/checkout');
+  };
 
   return (
     <>
@@ -232,6 +258,15 @@ export default function Home() {
                     className="flex flex-col w-full gap-4 border-b pb-3"
                   >
                     <div className="flex flex-row">
+                    <div className="w-[15%] relative h-16">
+                        {/* Hiển thị ảnh nếu có, thay thế nếu không có */}
+                        <Image
+                          fill
+                          style={{ objectFit: "cover" }}
+                          src={food?.food_thumbnail || "/images/placeholder.png"}
+                          alt={food.food_name}
+                        />
+                      </div>
                       <div className="w-[60%] flex flex-col gap-1 px-2">
                         <span className="font-bold text-[#464646]">
                           {food.food_name}
@@ -248,6 +283,22 @@ export default function Home() {
                       <div className="w-[10%] flex justify-center items-center">
                         <div className="h-6 w-6 rounded-md flex justify-center items-center bg-beamin text-white font-bold cursor-pointer hover:brightness-110">
                           <PlusOutlined />
+                        </div>
+                      </div>
+
+                      <div className="w-[10%] flex justify-center items-center">
+                        <InputNumber
+                          size="large"
+                          min={1}
+                          max={99}
+                          defaultValue={1}
+                          onChange={onChange}
+                        />
+                      </div>
+
+                      <div className="w-[30%] flex justify-center items-center" onClick={() => buyNow(food, quantity)}>
+                        <div className="h-6 px-5 rounded-md flex justify-center items-center bg-beamin text-white font-bold cursor-pointer hover:brightness-110">
+                          Buy Now
                         </div>
                       </div>
                     </div>

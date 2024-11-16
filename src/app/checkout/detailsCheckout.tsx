@@ -1,40 +1,40 @@
 import Image from "next/image";
 
 export default function DetailsCheckout({ items }: { items: any[] }) {
-    
-    return (
-        <>
-        
-            <div className="mt-3 ml-10 grid grid-cols-12">
-         
-             <div className="col-span-6" >Món Ăn</div>
-                <div className="col-span-2" >Đơn giá </div>
-                <div className="col-span-2" >Số Lượng </div>
-                <div className="col-span-2" >Thành tiền</div>
-           
-           
-            </div>
-       
-            {items.map((item: any, index: any) => (
-            <div key={index} className="mt-4 ml-10 grid grid-cols-12">
-            <div className="col-span-6 flex flex-row items-center gap-3" >
-                <div className="w-16 h-16 relative" > 
-                    <Image fill style={{objectFit:"cover"}} src={item.img} alt={""}  ></Image>
-                </div>
-                <div className="flex flex-col gap-1">
-                    <span className="text-base">{item.name}</span>
-                    <span className="text-sm text-gray-600">{item.description}</span>
-                </div>
-            </div>
-            <div className="col-span-2 ml-1 flex items-center" >{item.price} </div>
-            <div className="col-span-2 ml-5 flex items-center " >{item.quantity} </div>
-            <div className="col-span-2 ml-5  flex items-center" >{item.totalprice}</div>
+  return (
+    <>
+      <div className="mt-3 ml-10 grid grid-cols-12">
+        <div className="col-span-6 font-bold">Món Ăn</div>
+        <div className="col-span-2 font-bold">Đơn giá</div>
+        <div className="col-span-2 font-bold">Số lượng</div>
+        <div className="col-span-2 font-bold">Tổng giá</div>
+      </div>
+      {items.map((item, index) => (
+        <div
+          key={index}
+          className="mt-3 ml-10 grid grid-cols-12 items-center border-b pb-3"
+        >
+          {/* Hình ảnh và tên món ăn */}
+          <div className="col-span-6 flex items-center gap-4">
+            <Image
+              src={item.food_thumbnail}
+              alt={item.food_name}
+              width={50}
+              height={50}
+              className="rounded-md"
+            />
+            <span>{item.food_name}</span>
+          </div>
+          {/* Đơn giá */}
+          <div className="col-span-2">${item.per_price.toLocaleString()}</div>
+          {/* Số lượng */}
+          <div className="col-span-2">{item.quantity}</div>
+          {/* Tổng giá */}
+          <div className="col-span-2">
+            ${(item.per_price * item.quantity).toLocaleString()}
+          </div>
         </div>
-          
-           ))}
-        
-        </>
-
-    )
-
+      ))}
+    </>
+  );
 }
